@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo">
+        <!-- Customize your theme here. -->
+        <item name="android:actionBarTabBarStyle">@style/tabBarThick</item>
+    </style>
+
+    <style name="tabBarThick" parent="android:Widget.Holo.ActionBar.TabBar">
+        <item name="android:height">117dp</item>
+    </style>
+
+</resources>

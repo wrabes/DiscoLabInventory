@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checkOutFrag"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="40dp"
+    android:paddingTop="20dp"
+    android:paddingRight="40dp"
+    android:paddingBottom="10dp">
+
+    <RelativeLayout
+        android:id="@+id/checkout_browseInside"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <RelativeLayout
+            android:id="@+id/checkout_filterBar"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="81dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true">
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:id="@+id/checkout_browseByItem"
+                android:layout_alignTop="@+id/checkout_browseByCategory"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="65dp" />
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:id="@+id/checkout_browseByCategory"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/checkout_browseByItem"
+                android:layout_marginRight="65dp"
+                android:layout_marginLeft="75dp" />
+
+
+        </RelativeLayout>
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkout_browseListView"
+            android:layout_below="@+id/checkout_filterBar"
+            android:divider="#0000CC"/>
+
+    </RelativeLayout>
+</RelativeLayout>

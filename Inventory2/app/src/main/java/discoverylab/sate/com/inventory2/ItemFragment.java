@@ -28,14 +28,18 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     final String TAG = "ItemFragment";
 
+    //REQUIRED FIELDS (quantity is set to 1 by default, because items are not consumable by default...See Item class)
     private EditText itemName;
+    private EditText quantity;
+    private AutoCompleteTextView category;
+    private AutoCompleteTextView owner;
+
+
     private EditText itemId;
     private EditText description;
     private EditText price;
     private EditText locationInRoom;
     private EditText warrantyExpiration;
-    private EditText quantity;
-    private AutoCompleteTextView category;
     private AutoCompleteTextView associatedPerson;
     private TextView dateAdded;
     private Button  checkin, checkout;
@@ -50,16 +54,14 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     /**
      * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * this fragment
      *
      *
      * @return A new instance of fragment ItemFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ItemFragment newInstance() {
-        ItemFragment fragment = new ItemFragment();
 
-        return fragment;
+        return new ItemFragment();
     }
     public ItemFragment() {
         // Required empty public constructor
@@ -92,6 +94,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         //AutoCompleteTextView instantiations
         category = (AutoCompleteTextView) view.findViewById(R.id.category);
         associatedPerson = (AutoCompleteTextView) view.findViewById(R.id.associatedPerson);
+        owner = (AutoCompleteTextView) view.findViewById(R.id.itemOwner);
 
         //TextView instantiations
         dateAdded = (TextView) view.findViewById(R.id.dateAdded);
@@ -124,7 +127,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             locationInRoom.setText(selectedItem.getLocation());
             warrantyExpiration.setText(selectedItem.getWarrantyExpiration());
             quantity.setText(selectedItem.getQuantity()+"");
-
+            owner.setText(selectedItem.getOwner());
             category.setText(selectedItem.getCategory());
             associatedPerson.setText(selectedItem.getAssociatedPerson());
         }
@@ -168,14 +171,20 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     /**
      *
-     * @param cancel
-     *      button to cancel will be clickable
-     * @param edit
-     *      button to edit will be selected
-     * @param save
-     *      button to save will not be clickable
+     * this method changes the state of the buttons at the bottom of the item fragment.
+     *
+     * @param cancelAllowed
+     *      boolean value will be true always (i.e. the user can always click the cancel button)
+     *
+     * @param editAllowed
+     *      boolean value will be true when selecting an item from the browse/search fragment
+     *      boolean value will be false when selecting the AddItem fragment because the default mode is edit
+     *      boolean value will be false after selecting it once
+     *
+     * @param saveAllowed
+     *      boolean value will be true when edit is false and required fields have not yet been populated
      */
-    public void changeViewOptionsNew(Button cancel, Button edit, Button save){
+    public void changeViewOptions(boolean cancelAllowed, boolean editAllowed, boolean saveAllowed){
         //make sure the user can cancel
 
         //make sure the edit is already selected
@@ -184,46 +193,13 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     }
 
-    /**
-     *
-     * @param cancel
-     *      button to cancel will be clickable
-     * @param edit
-     *      button to edit will be deselected
-     * @param save
-     *      button to save will be clickable
-     */
-    public void changeViewOptionsOnEdit(Button cancel, Button edit, Button save){
-        //the user can save
 
-        //edit can be deselected
-
-        //the user can cancel
-    }
-
-    /**
-     *
-     * @param cancel
-     *      button to cancel will be clickable
-     * @param edit
-     *      button to edit will be clickable
-     * @param save
-     *      button to save will not be clickable
-     */
-    public void changeViewOptionsOnExisting(Button cancel, Button edit, Button save){
-
-        //the user can cancel (takes them back to the list)
-
-        //the user can select edit
-
-        //the user cannot select save
-
-    }
 
     /**
      *
      * @return true if any of the fields are being edited or have been edited
      */
+    //TODO be able to determine if the user is editing at the moment
     public boolean isEditing(){
         return false;
     }
@@ -233,6 +209,13 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
      */
     public void setItem(Item item){
         selectedItem = item;
+    }
+
+    /**
+     * method to change views so that they cannot be edited
+     */
+    private void canEdit(){
+
     }
 
 

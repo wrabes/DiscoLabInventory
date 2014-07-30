@@ -11,8 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -28,6 +34,9 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
     private Button noButton, yesButton;
     private AutoCompleteTextView associatedPerson;
     private Item itemToCheckOut;
+    private PersonList persons;
+    private ListView ListPersons;
+    private int canConfirm = 0;
 
 
 
@@ -60,6 +69,12 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
 
         View view = inflater.inflate(R.layout.fragment_confirm_check_out, container, false);
 
+        //give the personList data members
+        persons = PersonList.getInstance();
+
+        ArrayList<String> personNames = persons.personListNames();
+
+
         //TODO make a layout for this fragment
         noButton = (Button) view.findViewById(R.id.Checkout_No_Button);
         yesButton = (Button) view.findViewById(R.id.Checkout_Yes_Button);
@@ -68,6 +83,12 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
         //set onClickListeners for Buttons
         noButton.setOnClickListener(this);
         yesButton.setOnClickListener(this);
+
+        //set onClickListener for textview
+        associatedPerson.setOnClickListener(this);
+
+        
+
 
         if(getDialog() != null){
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -94,6 +115,7 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
 
                 break;
             case R.id.Checkout_associatedPerson:
+                //TODO do not enable the confirm button until the user selects a user from the list (person list must be populated)
 
                 break;
             default:

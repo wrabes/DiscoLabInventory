@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="350dp"
+    android:layout_height="180dp"
+    android:minHeight="180dp"
+    android:minWidth="350dp"
+    android:gravity="center_horizontal"
+    tools:context="discoverylab.sate.com.inventory2.ConfirmCheckIn">
+
+    <TextView
+        android:layout_width="350dp"
+        android:layout_height="40dp"
+        android:textSize="16sp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="8dp"
+        android:id="@+id/Checkout_prompt"
+        android:text="Associate this item with a person and confirm the checkout." />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:hint="Associated Person..."
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/Checkout_associatedPerson"
+        android:layout_below="@id/Checkout_prompt"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="130dp"
+        android:layout_height="60dp"
+        android:text="No"
+        android:id="@+id/Checkout_No_Button"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Checkout_associatedPerson"
+        android:layout_marginLeft="25dp" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="130dp"
+        android:layout_height="60dp"
+        android:text="Yes"
+        android:id="@+id/Checkout_Yes_Button"
+        android:layout_alignTop="@+id/Checkout_No_Button"
+        android:layout_toRightOf="@+id/Checkout_No_Button"
+        android:layout_toEndOf="@+id/Checkout_No_Button"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="25dp"/>
+
+
+
+</RelativeLayout>

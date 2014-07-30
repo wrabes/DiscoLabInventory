@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 
@@ -20,12 +21,13 @@ import android.widget.Button;
  * create an instance of this fragment.
  *
  */
-public class ConfirmCheckIn extends DialogFragment implements View.OnClickListener{
+public class ConfirmCheckOut extends DialogFragment implements View.OnClickListener{
 
-    private static final String TAG = "ConfirmCheckIn";
+    private static final String TAG = "ConfirmCheckOut";
 
     private Button noButton, yesButton;
-    private Item itemToCheckIn;
+    private AutoCompleteTextView associatedPerson;
+    private Item itemToCheckOut;
 
 
 
@@ -35,14 +37,14 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
      *
      * @return A new instance of fragment ConfirmCheckIn.
      */
-    public static ConfirmCheckIn newInstance() {
-        ConfirmCheckIn fragment = new ConfirmCheckIn();
+    public static ConfirmCheckOut newInstance() {
+        ConfirmCheckOut fragment = new ConfirmCheckOut();
         Bundle args = new Bundle();
 
         fragment.setArguments(args);
         return fragment;
     }
-    public ConfirmCheckIn() {
+    public ConfirmCheckOut() {
         // Required empty public constructor
     }
 
@@ -56,10 +58,12 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_confirm_check_in, container, false);
+        View view = inflater.inflate(R.layout.fragment_confirm_check_out, container, false);
 
-        noButton = (Button) view.findViewById(R.id.Checkin_No_Button);
-        yesButton = (Button) view.findViewById(R.id.Checkin_Yes_Button);
+        //TODO make a layout for this fragment
+        noButton = (Button) view.findViewById(R.id.Checkout_No_Button);
+        yesButton = (Button) view.findViewById(R.id.Checkout_Yes_Button);
+        associatedPerson = (AutoCompleteTextView) view.findViewById(R.id.Checkout_associatedPerson);
 
         //set onClickListeners for Buttons
         noButton.setOnClickListener(this);
@@ -67,7 +71,7 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
 
         if(getDialog() != null){
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            getDialog().setTitle("Confirm Check-in for "+itemToCheckIn.toString());
+            getDialog().setTitle("Confirm Check-out for "+itemToCheckOut.toString());
         }
 
         return view;
@@ -79,14 +83,17 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
     public void onClick(View view){
         //TODO save the availability if the user confirms the action, or cancel the changes if user negates the actions
         switch(view.getId()){
-            case R.id.Checkin_No_Button:
-                confirmCheckin();
+            case R.id.Checkout_No_Button:
+                confirmCheckOut();
                 this.dismiss();
                 break;
-            case R.id.Checkin_Yes_Button:
-                itemToCheckIn.checkIn();
-                confirmCheckin();
+            case R.id.Checkout_Yes_Button:
+                itemToCheckOut.checkOut();
+                confirmCheckOut();
                 this.dismiss();
+
+                break;
+            case R.id.Checkout_associatedPerson:
 
                 break;
             default:
@@ -101,10 +108,10 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
      * method to mutate the class variable Item so it can be checked
      */
     public void setItem(Item item){
-        itemToCheckIn = item;
+        itemToCheckOut = item;
     }
 
-    private void confirmCheckin() {
+    private void confirmCheckOut() {
 
         if (getTargetFragment() != null) {
             // for now just return patient id and note id so requester may retrieve it from the global store.

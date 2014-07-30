@@ -1,6 +1,7 @@
 package discoverylab.sate.com.inventory2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -27,6 +28,8 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
 
     List<Item> itemList ;//= ItemList.checkInList();
     ListView listOfItems;
+    private final int YES_BUTTON = 1;
+    private final int NO_BUTTON = 2;
     final String TAG = "CheckInFragment";
 
     /**
@@ -83,6 +86,8 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
             public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3){
                 //do something here...like enter a different view
                 Item selectedItem = itemList.get(position);
+
+                showCheckInDialog(selectedItem);
             }
         });
 
@@ -148,17 +153,42 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
                 //do something here...like enter a different view
                 Item selectedItem = (Item)arg0.getAdapter().getItem(position);//.get(position);
 
-                showItemDialog(selectedItem);
+                showCheckInDialog(selectedItem);
+
+                //itemList = ItemList.getInstance().checkInList();
+
             }
         });
     }
 
-    private void showItemDialog(Item item) {
+
+    private void showCheckInDialog(Item item) {
         android.app.FragmentManager fm = getFragmentManager();
-        ItemFragment itemFrag = new ItemFragment();
-        itemFrag.setItem(item);
-        itemFrag.setViewOptions(false);
-        itemFrag.show(fm, "fragment_edit_name");
+        ConfirmCheckIn confirm = new ConfirmCheckIn();
+        confirm.setTargetFragment(this, 1);
+
+        //gives the confirm checkIn fragment the item so that it is able to change it based onClick
+        confirm.setItem(item);
+
+        //this will show at the top of the dialog
+        String dialogTitle = "Confirm Check-in for "+item.getItemName();
+        confirm.show(fm, dialogTitle);
+
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            itemList = ItemList.getInstance().checkInList();
+
+            ListItemAdapter arrayAdapterAll = new ListItemAdapter(getActivity(), R.layout.browse_list_item, itemList);
+            setArrayAdapter(arrayAdapterAll);
+        }
+
+
+    }
+
+
+
 
 }

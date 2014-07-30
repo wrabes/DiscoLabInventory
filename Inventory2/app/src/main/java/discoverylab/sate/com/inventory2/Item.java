@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by Cameron on 7/1/14.
  */
 public class Item {
-    private String itemName, description, locationInRoom, category, itemId, dateAdded, warrantyExpiration, associatedPerson, unitPrice, dateChecked;
+    private String itemName, description, locationInRoom, category, itemId, dateAdded, warrantyExpiration, associatedPerson, unitPrice, dateChecked, owner;
     private boolean available, consumable=false;
     private int quantity=1;
     final int ONE = 1;
@@ -145,6 +145,15 @@ public class Item {
 
     public String getDateChecked(){
         return dateChecked;
+    }
+
+    public void setOwner(String givenOwner){
+        owner = givenOwner;
+    }
+
+    public String getOwner(){
+        return owner;
+        
     }
 
     public void setAssociatedPerson(String personName){

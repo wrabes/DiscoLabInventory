@@ -304,6 +304,8 @@ public final class ItemList {
 
     }
 
+    //TODO create a method that writes a line to the text file when the AddItem frag is used
+
     public class ItemComparator implements Comparator<Item> {
 
         @Override

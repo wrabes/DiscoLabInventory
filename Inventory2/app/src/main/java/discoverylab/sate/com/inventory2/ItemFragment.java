@@ -27,6 +27,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
 
     final String TAG = "ItemFragment";
+
     private EditText itemName;
     private EditText itemId;
     private EditText description;
@@ -37,7 +38,10 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     private AutoCompleteTextView category;
     private AutoCompleteTextView associatedPerson;
     private TextView dateAdded;
-    private Button cancel, edit, save, checkin, checkout;
+    private Button  checkin, checkout;
+
+
+    private Button cancel, edit, save;
     Item selectedItem;
     boolean isNew;
 
@@ -54,7 +58,6 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     // TODO: Rename and change types and number of parameters
     public static ItemFragment newInstance() {
         ItemFragment fragment = new ItemFragment();
-        Bundle args = new Bundle();
 
         return fragment;
     }

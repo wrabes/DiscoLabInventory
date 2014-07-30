@@ -119,6 +119,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         }
 
         if(!isNew){
+            changeViewOptions(true, true, false);
             //test this
             itemName.setText(selectedItem.getItemName());
             itemId.setText(selectedItem.getItemId());
@@ -130,8 +131,9 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             owner.setText(selectedItem.getOwner());
             category.setText(selectedItem.getCategory());
             associatedPerson.setText(selectedItem.getAssociatedPerson());
+        }else{
+            changeViewOptions(true, false, true);
         }
-
 
         return view;
     }
@@ -139,6 +141,35 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     @Override
     public void onClick(View view){
 
+        switch(view.getId()){
+            case R.id.cancel:
+                dismiss();
+                break;
+            case R.id.edit:
+                break;
+            case R.id.save:
+//                itemName.setText(selectedItem.getItemName());
+//                itemId.setText(selectedItem.getItemId());
+//                description.setText(selectedItem.getDescription());
+//                price.setText(selectedItem.getUnitPrice());
+//                locationInRoom.setText(selectedItem.getLocation());
+//                warrantyExpiration.setText(selectedItem.getWarrantyExpiration());
+//                quantity.setText(selectedItem.getQuantity()+"");
+//                owner.setText(selectedItem.getOwner());
+//                category.setText(selectedItem.getCategory());
+//                associatedPerson.setText(selectedItem.getAssociatedPerson());
+
+                selectedItem.setItemName(itemName.getText().toString());
+
+                //this forces the app to close
+                ItemList.getInstance().setItems(selectedItem);
+
+                break;
+            default:
+                Log.e(TAG, "No idea what you clicked.");
+
+
+        }
     }
 
 
@@ -186,10 +217,26 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
      */
     public void changeViewOptions(boolean cancelAllowed, boolean editAllowed, boolean saveAllowed){
         //make sure the user can cancel
+        cancelAllowed = true;
+        cancel.setClickable(true);
 
-        //make sure the edit is already selected
 
-        //make sure save cannot be selected
+        //handle the edit button and options associated
+        //if editing is allowed, the button should be clickable (only if existing item) and edit button is not already selected
+        if(editAllowed){
+            edit.setClickable(true);
+            save.setClickable(false);
+        }else{
+            edit.setClickable(false);
+
+            //this must mean that the user is already editing the item fields. the canEdit method handles which views to make editable
+            canEdit(true);
+
+            //TODO we need to check for proper input somewhere
+            save.setClickable(true);
+        }
+
+
 
     }
 
@@ -214,8 +261,58 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     /**
      * method to change views so that they cannot be edited
      */
-    private void canEdit(){
+    private void canEdit(boolean canEdit){
 
+        //if the views can be edited and it is a new item, all fields should be editable
+        if(canEdit && isNew){
+            itemName.setClickable(true);
+            owner.setClickable(true);
+            description.setClickable(true);
+            category.setClickable(true);
+            associatedPerson.setClickable(true);
+            checkin.setClickable(true);
+            checkout.setClickable(true);
+            locationInRoom.setClickable(true);
+            price.setClickable(true);
+            quantity.setClickable(true);
+            warrantyExpiration.setClickable(true);
+
+            dateAdded.setClickable(false);
+            itemId.setClickable(false);
+        }else if(canEdit && !isNew){
+            //if the edit button is clicked after selecting an item from the browse or search lists
+            description.setClickable(true);
+            associatedPerson.setClickable(true);
+            checkin.setClickable(true);
+            checkout.setClickable(true);
+            locationInRoom.setClickable(true);
+            warrantyExpiration.setClickable(true);
+
+
+            quantity.setClickable(false);
+            itemId.setClickable(false);
+            category.setClickable(false);
+            itemName.setClickable(false);
+            owner.setClickable(false);
+            dateAdded.setClickable(false);
+            price.setClickable(false);
+        }else{
+            //if you cannot edit the items (the save button has been clicked or you have just selected an item from the browse list or search list
+            itemName.setClickable(false);
+            owner.setClickable(false);
+            description.setClickable(false);
+            category.setClickable(false);
+            associatedPerson.setClickable(false);
+            checkin.setClickable(false);
+            checkout.setClickable(false);
+            locationInRoom.setClickable(false);
+            price.setClickable(false);
+            quantity.setClickable(false);
+            warrantyExpiration.setClickable(false);
+            dateAdded.setClickable(false);
+            itemId.setClickable(false);
+
+        }
     }
 
 

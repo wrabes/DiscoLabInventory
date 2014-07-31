@@ -2,6 +2,7 @@ package discoverylab.sate.com.inventory2;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -14,6 +15,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 /**
@@ -35,6 +39,10 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     private AutoCompleteTextView owner;
 
 
+
+    //get the context so making toast is possible
+    Context ctext;
+
     private EditText itemId;
     private EditText description;
     private EditText price;
@@ -47,6 +55,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     private Button cancel, edit, save;
     Item selectedItem;
+    Item newItem = new Item();
     boolean isNew;
 
 
@@ -131,7 +140,9 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             owner.setText(selectedItem.getOwner());
             category.setText(selectedItem.getCategory());
             associatedPerson.setText(selectedItem.getAssociatedPerson());
+            dateAdded.setText(selectedItem.getDateAdded());
         }else{
+
             changeViewOptions(true, false, true);
         }
 
@@ -143,7 +154,20 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
         switch(view.getId()){
             case R.id.cancel:
-                dismiss();
+                if(getDialog()!=null){
+                    getDialog().dismiss();
+                }else{
+                    itemName.setText("");
+                    itemId.setText("");
+                    description.setText("");
+                    price.setText("");
+                    locationInRoom.setText("");
+                    warrantyExpiration.setText("");
+                    quantity.setText("");
+                    owner.setText("");
+                    category.setText("");
+                    associatedPerson.setText("");
+                }
                 break;
             case R.id.edit:
                 break;
@@ -159,10 +183,47 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 //                category.setText(selectedItem.getCategory());
 //                associatedPerson.setText(selectedItem.getAssociatedPerson());
 
-                selectedItem.setItemName(itemName.getText().toString());
+                //if the item is a new item (accessed from the AddItem fragment) and the fields are correctly given
+                if(isNew && canSave()) {
+                    newItem.setItemName(itemName.getText().toString());
+                    newItem.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                    newItem.setCategory(category.getText().toString());
+                    newItem.setOwner(owner.getText().toString());
+                    newItem.setDescription(description.getText().toString());
+                    newItem.setItemId(itemId.getText().toString());
+                    newItem.setUnitPrice(price.getText().toString());
+                    newItem.setAssociatedPerson(associatedPerson.getText().toString());
+                    newItem.setLocation(locationInRoom.getText().toString());
+                    newItem.setWarrantyExpiration(warrantyExpiration.getText().toString());
 
-                //this forces the app to close
-                ItemList.getInstance().setItems(selectedItem);
+                    newItem.checkIn();
+                    newItem.setDateAdded();
+
+                    Toast.makeText(ctext, newItem.getItemName()+" successfully added to the inventory.", Toast.LENGTH_SHORT).show();
+
+                    ItemList.getInstance().setItems(newItem);
+
+
+                }else if(!isNew && canSave()){
+                    selectedItem.setItemName(itemName.getText().toString());
+                    selectedItem.setQuantity(Integer.parseInt(quantity.getText().toString()));
+                    selectedItem.setCategory(category.getText().toString());
+                    selectedItem.setOwner(owner.getText().toString());
+                    selectedItem.setDescription(description.getText().toString());
+                    selectedItem.setItemId(itemId.getText().toString());
+                    selectedItem.setUnitPrice(price.getText().toString());
+                    selectedItem.setAssociatedPerson(associatedPerson.getText().toString());
+                    selectedItem.setLocation(locationInRoom.getText().toString());
+                    selectedItem.setWarrantyExpiration(warrantyExpiration.getText().toString());
+
+
+                    ItemList.getInstance().setItems(selectedItem);
+                    Toast.makeText(ctext, "Changes to "+selectedItem.getItemName()+" successfully saved.", Toast.LENGTH_SHORT).show();
+                }
+
+                //make a new item now
+                setViewOptions(true);
+                newItem = new Item();
 
                 break;
             default:
@@ -176,6 +237,8 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
     @Override
     public void onAttach(Activity activity) {
+        ctext = getActivity();
+
         super.onAttach(activity);
 
     }
@@ -186,6 +249,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     @Override
     public void onDetach() {
         super.onDetach();
+        ctext = null;
     }
 
     /**
@@ -225,15 +289,21 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         //if editing is allowed, the button should be clickable (only if existing item) and edit button is not already selected
         if(editAllowed){
             edit.setClickable(true);
+            edit.setEnabled(true);
+
             save.setClickable(false);
+            save.setEnabled(false);
         }else{
             edit.setClickable(false);
+            edit.setEnabled(false);
 
             //this must mean that the user is already editing the item fields. the canEdit method handles which views to make editable
             canEdit(true);
 
             //TODO we need to check for proper input somewhere
+
             save.setClickable(true);
+            save.setEnabled(true);
         }
 
 
@@ -241,18 +311,8 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     }
 
 
-
     /**
-     *
-     * @return true if any of the fields are being edited or have been edited
-     */
-    //TODO be able to determine if the user is editing at the moment
-    public boolean isEditing(){
-        return false;
-    }
-
-    /**
-     * method to populate the dialog
+     * method to populate the dialog of an existing item with the item's information
      */
     public void setItem(Item item){
         selectedItem = item;
@@ -313,6 +373,73 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             itemId.setClickable(false);
 
         }
+    }
+
+    public boolean canSave(){
+        assert itemName.getText().toString() != null: "Violation of: itemName is not null";
+        assert owner.getText().toString() != null: "Violation of: owner is not null";
+        assert category.getText().toString() != null: "Violation of: category is not null";
+        assert quantity.getText().toString() != null: "Violation of: quantity is not null";
+
+
+        boolean canSave = true;
+
+
+        String itemNameText = itemName.getText().toString();
+        String ownerText = owner.getText().toString();
+        String categoryText = category.getText().toString();
+        String quantityText = quantity.getText().toString();
+        if(quantityText.equals("")){ //this makes sure that the string is not empty so that an "invalidInt" exception
+                                     // does not arise when using Integer.parseInt
+            quantity.setText("1");
+            quantityText += quantity.getText().toString();
+        }
+
+
+
+        //these are the required fields which have very specific parameters. See Toast for details.
+        if((itemNameText.length() <3)){
+            canSave = false;
+            Toast.makeText(ctext,  "Item name must be at least three characters.", Toast.LENGTH_SHORT).show();
+        }else if(itemNameText.substring(0,3).contains(" ")) {
+            canSave = false;
+            Toast.makeText(ctext,  "Item name must not contain spaces within the first three characters.", Toast.LENGTH_SHORT).show();
+        }
+
+        if((ownerText.length() <3)){
+            canSave = false;
+            Toast.makeText(ctext,  "Owner must be at least three characters.", Toast.LENGTH_SHORT).show();
+        }else if(ownerText.substring(0,3).contains(" ")) {
+            canSave = false;
+            Toast.makeText(ctext,  "Owner must not contain spaces within the first three characters.", Toast.LENGTH_SHORT).show();
+        }
+
+        if((categoryText.length() <3)){
+            canSave = false;
+            Toast.makeText(ctext,  "Category must be at least three characters.", Toast.LENGTH_SHORT).show();
+        }else if(categoryText.substring(0,3).contains(" ")) {
+            canSave = false;
+            Toast.makeText(ctext,  "Category must not contain spaces within the first three characters.", Toast.LENGTH_SHORT).show();
+        }
+
+        //if the quantity is set to greater than one, we must set the item to be consumable
+        if(Integer.parseInt(quantityText) > 1){
+
+            //if it is a new item, this is straightforward
+            if(isNew){
+                newItem.setConsumable();
+            }else if(selectedItem.consumable()){ //check if the existing item is already marked as consumable. if so, change quantity
+                selectedItem.setQuantity(Integer.parseInt(quantityText));
+                Toast.makeText(ctext, itemNameText+" quantity set to "+quantityText, Toast.LENGTH_SHORT).show();
+            }else{ //if the selected item is not new, and it is not already marked as consumable, changing the quantity is not allowed
+                selectedItem.setQuantity(1);
+                quantity.setText("1");
+                Toast.makeText(ctext, "This item is not consumable.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        //return the boolean which verifies the fields are filled in correctly and the button should be clickable
+        return canSave;
     }
 
 

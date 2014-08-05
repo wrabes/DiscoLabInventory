@@ -40,7 +40,6 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
      */
     public static CheckInFragment newInstance() {
         CheckInFragment fragment = new CheckInFragment();
-        Bundle args = new Bundle();
         return fragment;
     }
     public CheckInFragment() {
@@ -51,6 +50,19 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    @Override
+    public void onStart(){
+        Log.e(TAG, "starting checkin fragment view");
+        super.onStart();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.e(TAG, "resuming checkin fragment view");
+        ((ListItemAdapter)listOfItems.getAdapter()).notifyDataSetChanged();
     }
 
 
@@ -100,12 +112,15 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.e(TAG, "attaching checkin frag to activity");
+
 
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.e(TAG, "detaching checkin frag from activity");
 
     }
 
@@ -183,6 +198,9 @@ public class CheckInFragment extends Fragment implements View.OnClickListener {
 
             ListItemAdapter arrayAdapterAll = new ListItemAdapter(getActivity(), R.layout.browse_list_item, itemList);
             setArrayAdapter(arrayAdapterAll);
+
+            getActivity().onContentChanged();
+
         }
 
 

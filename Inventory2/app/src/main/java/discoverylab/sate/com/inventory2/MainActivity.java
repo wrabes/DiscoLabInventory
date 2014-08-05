@@ -54,6 +54,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
@@ -61,6 +62,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             @Override
             public void onPageSelected(int position) {
                 actionBar.setSelectedNavigationItem(position);
+
             }
         });
 
@@ -77,6 +79,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
     }
+
+    public SectionsPagerAdapter getmSectionsPagerAdapter(){
+        return mSectionsPagerAdapter;
+    }
+
+
 
 
     @Override
@@ -113,16 +121,24 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
 
         @Override
@@ -179,6 +195,20 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     return getString(R.string.title_section5).toUpperCase(l);
             }
             return null;
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
         }
     }
 

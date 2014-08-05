@@ -3,6 +3,7 @@ package discoverylab.sate.com.inventory2;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -40,8 +42,12 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
 
 
+
+
     //get the context so making toast is possible
     Context ctext;
+
+
 
     private EditText itemId;
     private EditText description;
@@ -54,9 +60,10 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
 
     private Button cancel, edit, save;
-    Item selectedItem;
+     Item selectedItem;
     Item newItem = new Item();
     boolean isNew;
+    boolean available;
 
 
 
@@ -76,9 +83,10 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         // Required empty public constructor
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG, "creating item fragment view.");
 
         super.onCreate(savedInstanceState);
 
@@ -91,59 +99,27 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item, container, false);
 
-        //EditText instantiations
-        itemName = (EditText) view.findViewById(R.id.itemName);
-        itemId = (EditText) view.findViewById(R.id.itemId);
-        description = (EditText) view.findViewById(R.id.description);
-        price = (EditText) view.findViewById(R.id.price);
-        locationInRoom = (EditText) view.findViewById(R.id.locationInRoom);
-        warrantyExpiration = (EditText) view.findViewById(R.id.warrantyExpiration);
-        quantity = (EditText) view.findViewById(R.id.quantity);
-
-        //AutoCompleteTextView instantiations
-        category = (AutoCompleteTextView) view.findViewById(R.id.category);
-        associatedPerson = (AutoCompleteTextView) view.findViewById(R.id.associatedPerson);
-        owner = (AutoCompleteTextView) view.findViewById(R.id.itemOwner);
-
-        //TextView instantiations
-        dateAdded = (TextView) view.findViewById(R.id.dateAdded);
-
-        //Button instantiations
-        cancel = (Button) view.findViewById(R.id.cancel);
-        edit = (Button) view.findViewById(R.id.edit);
-        save = (Button) view.findViewById(R.id.save);
-        checkin = (Button) view.findViewById(R.id.checkIn);
-        checkout = (Button) view.findViewById(R.id.checkOut);
-
+        //EditText instantiations, AutoCompleteTextView instantiations, TextView instantiations, Button instantiations
+        instViews(view);
 
         //set onClickListeners for Buttons
-        cancel.setOnClickListener(this);
-        edit.setOnClickListener(this);
-        save.setOnClickListener(this);
+        setClickListeners();
+
 
 
         if(getDialog() != null){
+
             getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            getDialog().setTitle("View Item");
+            getDialog().setTitle("View Item #"+selectedItem.getItemId()+" – "+selectedItem.getItemName());
         }
 
         if(!isNew){
-            changeViewOptions(true, true, false);
-            //test this
-            itemName.setText(selectedItem.getItemName());
-            itemId.setText(selectedItem.getItemId());
-            description.setText(selectedItem.getDescription());
-            price.setText(selectedItem.getUnitPrice());
-            locationInRoom.setText(selectedItem.getLocation());
-            warrantyExpiration.setText(selectedItem.getWarrantyExpiration());
-            quantity.setText(selectedItem.getQuantity()+"");
-            owner.setText(selectedItem.getOwner());
-            category.setText(selectedItem.getCategory());
-            associatedPerson.setText(selectedItem.getAssociatedPerson());
-            dateAdded.setText(selectedItem.getDateAdded());
+            changeControlViewOptions(true);
+            populateItemViews();
+
         }else{
 
-            changeViewOptions(true, false, true);
+            changeControlViewOptions(false);
         }
 
         return view;
@@ -153,77 +129,93 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     public void onClick(View view){
 
         switch(view.getId()){
+            case R.id.checkIn:
+                available = true;
+                Toast.makeText(ctext, "The item will be checked in.", Toast.LENGTH_SHORT).show();
+
+                setCheckInButton(false);
+
+
+
+                break;
+            case R.id.checkOut:
+                //if the user did not provide a person to checkout an item to, the item cannot be checked out until they do
+
+                try {
+                    if (canCheckOut()) {
+                        available = false;
+                        Toast.makeText(ctext, "The item will be checked out.", Toast.LENGTH_SHORT).show();
+                        setCheckInButton(true);
+
+
+                    } else {
+                        Toast.makeText(ctext, "A person must be associated in order to checkout.", Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch(NullPointerException e){
+                        Toast.makeText(ctext, "A person must be associated in order to checkout.", Toast.LENGTH_LONG).show();
+                };
+
+
+                break;
             case R.id.cancel:
+
                 if(getDialog()!=null){
                     getDialog().dismiss();
+
                 }else{
-                    itemName.setText("");
-                    itemId.setText("");
-                    description.setText("");
-                    price.setText("");
-                    locationInRoom.setText("");
-                    warrantyExpiration.setText("");
-                    quantity.setText("");
-                    owner.setText("");
-                    category.setText("");
-                    associatedPerson.setText("");
+                    clearNewItemView();
                 }
+
                 break;
             case R.id.edit:
+
+                changeControlViewOptions(false);
+
                 break;
             case R.id.save:
-//                itemName.setText(selectedItem.getItemName());
-//                itemId.setText(selectedItem.getItemId());
-//                description.setText(selectedItem.getDescription());
-//                price.setText(selectedItem.getUnitPrice());
-//                locationInRoom.setText(selectedItem.getLocation());
-//                warrantyExpiration.setText(selectedItem.getWarrantyExpiration());
-//                quantity.setText(selectedItem.getQuantity()+"");
-//                owner.setText(selectedItem.getOwner());
-//                category.setText(selectedItem.getCategory());
-//                associatedPerson.setText(selectedItem.getAssociatedPerson());
 
-                //if the item is a new item (accessed from the AddItem fragment) and the fields are correctly given
-                if(isNew && canSave()) {
-                    newItem.setItemName(itemName.getText().toString());
-                    newItem.setQuantity(Integer.parseInt(quantity.getText().toString()));
-                    newItem.setCategory(category.getText().toString());
-                    newItem.setOwner(owner.getText().toString());
-                    newItem.setDescription(description.getText().toString());
-                    newItem.setItemId(itemId.getText().toString());
-                    newItem.setUnitPrice(price.getText().toString());
-                    newItem.setAssociatedPerson(associatedPerson.getText().toString());
-                    newItem.setLocation(locationInRoom.getText().toString());
-                    newItem.setWarrantyExpiration(warrantyExpiration.getText().toString());
-
-                    newItem.checkIn();
-                    newItem.setDateAdded();
-
-                    Toast.makeText(ctext, newItem.getItemName()+" successfully added to the inventory.", Toast.LENGTH_SHORT).show();
-
-                    ItemList.getInstance().setItems(newItem);
+                if(canSave()) {
 
 
-                }else if(!isNew && canSave()){
-                    selectedItem.setItemName(itemName.getText().toString());
-                    selectedItem.setQuantity(Integer.parseInt(quantity.getText().toString()));
-                    selectedItem.setCategory(category.getText().toString());
-                    selectedItem.setOwner(owner.getText().toString());
-                    selectedItem.setDescription(description.getText().toString());
-                    selectedItem.setItemId(itemId.getText().toString());
-                    selectedItem.setUnitPrice(price.getText().toString());
-                    selectedItem.setAssociatedPerson(associatedPerson.getText().toString());
-                    selectedItem.setLocation(locationInRoom.getText().toString());
-                    selectedItem.setWarrantyExpiration(warrantyExpiration.getText().toString());
+                    //if the item is a new item (accessed from the AddItem fragment) and the fields are correctly given
+                    if (isNew) {
+                        Log.e(TAG, "Save was clicked and isNew == true, canSave() == true");
+
+                        saveItem(newItem);
+
+                        //newItem.checkIn();
+                        newItem.setDateAdded();
 
 
-                    ItemList.getInstance().setItems(selectedItem);
-                    Toast.makeText(ctext, "Changes to "+selectedItem.getItemName()+" successfully saved.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctext, newItem.getItemName() + " successfully saved.", Toast.LENGTH_SHORT).show();
+
+                        //this will add the item to the list of items
+                        ItemList.getInstance().setItems(newItem);
+
+
+                        clearNewItemView();
+
+                    } else {
+                        //if the user is editing an item
+
+                        Log.e(TAG, "Save was clicked and isNew == false, canSave() == true");
+
+                        confirmSave();
+                        saveItem(selectedItem);
+
+
+                        Toast.makeText(ctext, "Changes to " + selectedItem.getItemName() + " successfully saved.", Toast.LENGTH_SHORT).show();
+                        ((MainActivity)getActivity()).getmSectionsPagerAdapter().notifyDataSetChanged();
+
+
+                        dismiss();
+                    }
                 }
 
-                //make a new item now
-                setViewOptions(true);
-                newItem = new Item();
+
+
+
 
                 break;
             default:
@@ -267,40 +259,41 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     /**
      *
      * this method changes the state of the buttons at the bottom of the item fragment.
-     *
-     * @param cancelAllowed
-     *      boolean value will be true always (i.e. the user can always click the cancel button)
+
      *
      * @param editAllowed
      *      boolean value will be true when selecting an item from the browse/search fragment
      *      boolean value will be false when selecting the AddItem fragment because the default mode is edit
      *      boolean value will be false after selecting it once
      *
-     * @param saveAllowed
-     *      boolean value will be true when edit is false and required fields have not yet been populated
+     *
      */
-    public void changeViewOptions(boolean cancelAllowed, boolean editAllowed, boolean saveAllowed){
+    private void changeControlViewOptions(boolean editAllowed){
         //make sure the user can cancel
-        cancelAllowed = true;
         cancel.setClickable(true);
+
+
 
 
         //handle the edit button and options associated
         //if editing is allowed, the button should be clickable (only if existing item) and edit button is not already selected
         if(editAllowed){
+            Log.e(TAG, "changeControlViewOptions: edit allowed. save not allowed.");
             edit.setClickable(true);
             edit.setEnabled(true);
 
             save.setClickable(false);
             save.setEnabled(false);
+
+            changeItemViewOptions(false);
         }else{
+            Log.e(TAG, "changeControlViewOptions: edit not allowed. save allowed.");
+
             edit.setClickable(false);
             edit.setEnabled(false);
 
             //this must mean that the user is already editing the item fields. the canEdit method handles which views to make editable
-            canEdit(true);
-
-            //TODO we need to check for proper input somewhere
+            changeItemViewOptions(true);
 
             save.setClickable(true);
             save.setEnabled(true);
@@ -318,64 +311,135 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         selectedItem = item;
     }
 
+
+    /**
+     * This helper method is used if the item is not a new item. It will fill the textViews with the existing data
+     * from the item which was selected.
+     */
+    private void populateItemViews(){
+        itemName.setText(selectedItem.getItemName());
+        itemId.setText(selectedItem.getItemId());
+        description.setText(selectedItem.getDescription());
+        price.setText(selectedItem.getUnitPrice());
+        locationInRoom.setText(selectedItem.getLocation());
+        warrantyExpiration.setText(selectedItem.getWarrantyExpiration());
+        quantity.setText(selectedItem.getQuantity()+"");
+        owner.setText(selectedItem.getOwner());
+        category.setText(selectedItem.getCategory());
+        associatedPerson.setText(selectedItem.getAssociatedPerson());
+        dateAdded.setText(selectedItem.getDateAdded());
+
+        if(selectedItem.isAvailable()){
+            available = true;
+        }else{
+            available = false;
+        }
+
+    }
+
+    /**
+     * helper method to toggle the checkin-checkout buttons because they will never both be clickable simultaneously
+     *
+     * @param  checkInClickable
+     *        iff true, checkIn will be clickable
+     *                  checkout will be unclickable
+     *        iff false, checkIn will be unclickable
+     *                   checkout will be clickable
+     */
+    private void setCheckInButton(boolean checkInClickable){
+        if(checkInClickable){
+            checkin.setEnabled(true);
+            checkout.setEnabled(false);
+        }else{
+            checkin.setEnabled(false);
+            checkout.setEnabled(true);
+        }
+    }
+
     /**
      * method to change views so that they cannot be edited
      */
-    private void canEdit(boolean canEdit){
+    private void changeItemViewOptions(boolean canEditViews){
 
         //if the views can be edited and it is a new item, all fields should be editable
-        if(canEdit && isNew){
-            itemName.setClickable(true);
-            owner.setClickable(true);
-            description.setClickable(true);
-            category.setClickable(true);
-            associatedPerson.setClickable(true);
-            checkin.setClickable(true);
-            checkout.setClickable(true);
-            locationInRoom.setClickable(true);
-            price.setClickable(true);
-            quantity.setClickable(true);
-            warrantyExpiration.setClickable(true);
-
-            dateAdded.setClickable(false);
-            itemId.setClickable(false);
-        }else if(canEdit && !isNew){
-            //if the edit button is clicked after selecting an item from the browse or search lists
-            description.setClickable(true);
-            associatedPerson.setClickable(true);
-            checkin.setClickable(true);
-            checkout.setClickable(true);
-            locationInRoom.setClickable(true);
-            warrantyExpiration.setClickable(true);
+        if(canEditViews){
 
 
-            quantity.setClickable(false);
-            itemId.setClickable(false);
-            category.setClickable(false);
-            itemName.setClickable(false);
-            owner.setClickable(false);
-            dateAdded.setClickable(false);
-            price.setClickable(false);
+            if(isNew) {
+                Log.e(TAG, "changeItemViewOptions: canEdit == true and isNew == true");
+                itemName.setEnabled(true);
+                owner.setEnabled(true);
+                description.setEnabled(true);
+                category.setEnabled(true);
+                associatedPerson.setEnabled(true);
+                locationInRoom.setEnabled(true);
+                price.setEnabled(true);
+                quantity.setEnabled(true);
+                warrantyExpiration.setEnabled(true);
+
+                checkout.setEnabled(false);
+                checkin.setEnabled(false);
+                dateAdded.setEnabled(false);
+                itemId.setEnabled(false);
+            }else {//if the edit button is clicked after selecting an item from the browse or search lists
+                Log.e(TAG, "changeItemViewOptions: canEdit == true and the isNew == false");
+                description.setEnabled(true);
+                associatedPerson.setEnabled(true);
+
+                if(selectedItem.isAvailable()){
+                    setCheckInButton(false);
+                }else{
+                    setCheckInButton(true);
+                }
+
+                locationInRoom.setEnabled(true);
+                warrantyExpiration.setEnabled(true);
+
+
+                quantity.setEnabled(false);
+                itemId.setEnabled(false);
+                category.setEnabled(false);
+                itemName.setEnabled(false);
+                owner.setEnabled(false);
+                dateAdded.setEnabled(false);
+                price.setEnabled(false);
+            }
+
         }else{
             //if you cannot edit the items (the save button has been clicked or you have just selected an item from the browse list or search list
-            itemName.setClickable(false);
-            owner.setClickable(false);
-            description.setClickable(false);
-            category.setClickable(false);
-            associatedPerson.setClickable(false);
-            checkin.setClickable(false);
-            checkout.setClickable(false);
-            locationInRoom.setClickable(false);
-            price.setClickable(false);
-            quantity.setClickable(false);
-            warrantyExpiration.setClickable(false);
-            dateAdded.setClickable(false);
-            itemId.setClickable(false);
+            itemName.setEnabled(false);
+            owner.setEnabled(false);
+            description.setEnabled(false);
+            category.setEnabled(false);
+            associatedPerson.setEnabled(false);
+            checkin.setEnabled(false);
+            checkout.setEnabled(false);
+            locationInRoom.setEnabled(false);
+            price.setEnabled(false);
+            quantity.setEnabled(false);
+            warrantyExpiration.setEnabled(false);
+            dateAdded.setEnabled(false);
+            itemId.setEnabled(false);
 
         }
     }
 
-    public boolean canSave(){
+    /**
+     * This method handles the required fields which must be completed before an item can be saved to the inventory.
+     * these required fields are {@code itemName, owner, category, quantity}. Each item must have a name, an owner, and a category
+     * that must follow the convention of at least three characters, of which the first three may not contain a space.
+     * If the quantity entered by the user is 1, the item is set to be NOT consumable
+     *      where as if the quantity entered by user is greater than 1, it is set to be consumable
+     *      if the quantity is not set by the user, the quantity is set to 1 and the item is set to consumable
+     *
+     * @return canSave
+     *      iff length of {@code itemName} > 2, and {@code itemName.substring(0,3)} does not contain ' '
+     *      iff length of {@code owner} > 2, and {@code owner.substring(0,3)} does not contain ' '
+     *      iff length of {@code category} > 2, and {@code category.substring(0,3)} does not contain ' '
+     *
+     *
+     */
+    private boolean canSave(){
         assert itemName.getText().toString() != null: "Violation of: itemName is not null";
         assert owner.getText().toString() != null: "Violation of: owner is not null";
         assert category.getText().toString() != null: "Violation of: category is not null";
@@ -385,10 +449,13 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
         boolean canSave = true;
 
 
+        //the text of each view is stored in a String to make handling input easier
         String itemNameText = itemName.getText().toString();
         String ownerText = owner.getText().toString();
         String categoryText = category.getText().toString();
         String quantityText = quantity.getText().toString();
+        String associatedPersonText = associatedPerson.getText().toString();
+
         if(quantityText.equals("")){ //this makes sure that the string is not empty so that an "invalidInt" exception
                                      // does not arise when using Integer.parseInt
             quantity.setText("1");
@@ -398,6 +465,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
 
         //these are the required fields which have very specific parameters. See Toast for details.
+        //handles the required field itemName
         if((itemNameText.length() <3)){
             canSave = false;
             Toast.makeText(ctext,  "Item name must be at least three characters.", Toast.LENGTH_SHORT).show();
@@ -406,6 +474,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             Toast.makeText(ctext,  "Item name must not contain spaces within the first three characters.", Toast.LENGTH_SHORT).show();
         }
 
+        //handles the required field owner
         if((ownerText.length() <3)){
             canSave = false;
             Toast.makeText(ctext,  "Owner must be at least three characters.", Toast.LENGTH_SHORT).show();
@@ -414,6 +483,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             Toast.makeText(ctext,  "Owner must not contain spaces within the first three characters.", Toast.LENGTH_SHORT).show();
         }
 
+        //handles the required field category
         if((categoryText.length() <3)){
             canSave = false;
             Toast.makeText(ctext,  "Category must be at least three characters.", Toast.LENGTH_SHORT).show();
@@ -438,9 +508,147 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             }
         }
 
+
+        try {//if there is not a valid person associated with the item and it is listed as "unavailable"
+            if (!canCheckOut() && !selectedItem.isAvailable()) {
+                //meaning the user changed the name field to something invalid while the item is still checked out
+                //selectedItem.checkIn();
+                Toast.makeText(ctext, "The item cannot be checked out to that person.", Toast.LENGTH_LONG).show();
+                canSave = false;
+            }
+        }catch(NullPointerException n){
+            canSave = false;
+            Log.e(TAG, "caught in canSave()");
+        }
+
         //return the boolean which verifies the fields are filled in correctly and the button should be clickable
         return canSave;
     }
 
+    private boolean canCheckOut(){
 
+        boolean canCheckOut = true;
+
+        if(!isNew) {
+            try {
+                String person = associatedPerson.getText().toString();
+
+                if (person.equals("none") || person.equals("") || person.length() < 3) {
+                    canCheckOut = false;
+                } else if (person.substring(0, 3).contains(" ")) {
+                    canCheckOut = false;
+                }
+            } catch (Exception e) {
+                canCheckOut = false;
+                Log.e(TAG, "caught in canCheckOut()");
+
+            }
+        }
+
+        return canCheckOut;
+    }
+
+    /**
+     * Helper method to clean up the OnCreate method. Sets onClickListener to each button in the itemFragment
+     */
+    private void setClickListeners(){
+
+        checkout.setOnClickListener(this);
+        checkin.setOnClickListener(this);
+        cancel.setOnClickListener(this);
+        edit.setOnClickListener(this);
+        save.setOnClickListener(this);
+    }
+
+    /**
+     * Helper method to clean up the OnCreate method. Finds the view associated with the resource ID given to it.
+     * Instantiates a view object with its proper type given the ID.
+     *
+     * @param view
+     *      needed to reference the resource file which contains the layout of an item fragment.
+     */
+    private void instViews(View view){
+
+        itemName = (EditText) view.findViewById(R.id.itemName);
+        itemId = (EditText) view.findViewById(R.id.itemId);
+        description = (EditText) view.findViewById(R.id.description);
+        price = (EditText) view.findViewById(R.id.price);
+        locationInRoom = (EditText) view.findViewById(R.id.locationInRoom);
+        warrantyExpiration = (EditText) view.findViewById(R.id.warrantyExpiration);
+        quantity = (EditText) view.findViewById(R.id.quantity);
+
+        category = (AutoCompleteTextView) view.findViewById(R.id.category);
+        associatedPerson = (AutoCompleteTextView) view.findViewById(R.id.associatedPerson);
+        owner = (AutoCompleteTextView) view.findViewById(R.id.itemOwner);
+
+        dateAdded = (TextView) view.findViewById(R.id.dateAdded);
+
+        cancel = (Button) view.findViewById(R.id.cancel);
+        edit = (Button) view.findViewById(R.id.edit);
+        save = (Button) view.findViewById(R.id.save);
+        checkin = (Button) view.findViewById(R.id.checkIn);
+        checkout = (Button) view.findViewById(R.id.checkOut);
+    }
+
+    /**
+     * When the user is adding a new item to the inventory and presses 'Cancel', this helper method sets views to default value
+     */
+    private void clearNewItemView(){
+        itemName.setText("");
+        itemId.setText("");
+        description.setText("");
+        price.setText("");
+        locationInRoom.setText("");
+        warrantyExpiration.setText("");
+        quantity.setText("");
+        owner.setText("");
+        category.setText("");
+        associatedPerson.setText("");
+
+        isNew = true;
+        newItem = new Item();
+
+
+    }
+
+    /**
+     * Helper method that uses the mutators in the Item class to set the item attributes as the
+     * text that is contained in the associated View on the fragment
+     *
+     * @param item
+     *      and Item to be added to the inventory (or edited)
+     */
+    private void saveItem(Item item){
+        item.setItemName(itemName.getText().toString());
+        item.setQuantity(Integer.parseInt(quantity.getText().toString()));
+        item.setCategory(category.getText().toString());
+        item.setOwner(owner.getText().toString());
+        item.setDescription(description.getText().toString());
+        item.setItemId();
+        item.setUnitPrice(price.getText().toString());
+        item.setAssociatedPerson(associatedPerson.getText().toString());
+        item.setLocation(locationInRoom.getText().toString());
+        item.setWarrantyExpiration(warrantyExpiration.getText().toString());
+
+        //this available flag is set each time checkin is selected and reset when checkout is selected.
+        //the flag is kept here so it is guaranteed to go through "canCheckOut" and "canSave"
+        if(available){
+            item.checkIn();
+        }else{
+            item.checkOut();
+        }
+
+        if(isNew){
+            item.setDateAdded();
+            item.setDateChecked();
+        }
+    }
+
+    private void confirmSave() {
+
+        if (getTargetFragment() != null) {
+            Intent i = new Intent();
+            getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
+        }
+    }
 }

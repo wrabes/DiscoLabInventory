@@ -1,6 +1,7 @@
 package discoverylab.sate.com.inventory2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import java.util.List;
 public class BrowseFragment extends Fragment implements View.OnClickListener {
 
 
+
     List<Item> itemList;
     ListView listOfItems;
     int counter=0;
@@ -56,6 +58,16 @@ public class BrowseFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+    @Override
+      public void onResume(){
+        super.onResume();
+        ((ListItemAdapter)listOfItems.getAdapter()).notifyDataSetChanged();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -201,9 +213,26 @@ public class BrowseFragment extends Fragment implements View.OnClickListener {
     private void showItemDialog(Item item) {
         android.app.FragmentManager fm = getFragmentManager();
         ItemFragment itemFrag = new ItemFragment();
+        itemFrag.setTargetFragment(this, 1);
+
+
         itemFrag.setItem(item);
         itemFrag.setViewOptions(false);
         itemFrag.show(fm, "fragment_edit_name");
+    }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            itemList = ItemList.getInstance().masterList();
+
+            ListItemAdapter arrayAdapterAll = new ListItemAdapter(getActivity(), R.layout.browse_list_item, itemList);
+            setArrayAdapter(arrayAdapterAll);
+        }
+
+
     }
 
 

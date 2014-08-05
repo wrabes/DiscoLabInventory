@@ -127,7 +127,8 @@
             android:layout_alignParentStart="false"
             android:editable="true"
             android:clickable="true"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:inputType="numberDecimal" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -242,7 +243,6 @@
             android:layout_alignTop="@+id/checkOut"
             android:layout_alignBottom="@+id/checkOut"
             android:textStyle="bold"
-            android:textColor="#ffffff"
             android:clickable="true" />
 
         <Button

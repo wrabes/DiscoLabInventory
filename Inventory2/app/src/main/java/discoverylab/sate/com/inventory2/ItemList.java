@@ -17,11 +17,14 @@ import java.util.*;
  */
 public final class ItemList {
 
-    private static List<Item> items = new ArrayList<Item>();;
+    private static List<Item> items = new ArrayList<Item>();
     private static ItemList instance;
     private static final String TAG = "ItemList";
     private ItemComparator comp = new ItemComparator();
 
+    //map object that can be accessed from the other classes for quick searching.
+    //map of item and itemId
+    private static Map<String, Item> IDMap;
 
     private ItemList(){
 
@@ -30,6 +33,8 @@ public final class ItemList {
     public static ItemList getInstance(){
         if(instance == null){
             instance = new ItemList();
+            IDMap = new HashMap<String, Item>();
+
         }
         return instance;
     }
@@ -225,13 +230,56 @@ public final class ItemList {
     }
 
     /**
-     * Adds an Item to the {@code items} list
+     * Adds an Item to the {@code items} list and updates the {@code Map to reflect new item}
+     * sets the {@code itemId} as the {@code Pair.key} and {@code Item} as the {@code Pair.value}
+     * and adds the pair to the Map
      *
      * @param item
      */
     public void setItems(Item item){
+        String id = item.getItemId();
         items.add(item);
+        IDMap.put(id, item);
+
     }
+
+
+
+    /**
+     *
+     * @param tempId the itemId up until the entry number part
+     *
+     * @return the suffix of the id, which is the entry number within the category (of items with same id)
+     */
+    public String itemIdEntryNumber(String tempId){
+        //the last three characters to add to the string based on previous entries
+        String idSuffix="";
+        int similarEntryCount = 0;
+
+        Iterator<Item> it = items.iterator();
+
+        while(it.hasNext()){
+            String compId = it.next().getItemId();
+
+            if(compId.contains(tempId)){
+                similarEntryCount++;
+            }
+        }
+
+        if(similarEntryCount < 100) {
+            if (similarEntryCount > 9) {
+                idSuffix = "0" + similarEntryCount;
+            } else {
+                idSuffix = "00" + similarEntryCount;
+            }
+        }else {
+            idSuffix += similarEntryCount;
+        }
+
+        return idSuffix;
+    }
+
+
 
     /**
      * reads a String and separates it into smaller Strings based on semicolons as delimiters.
@@ -252,17 +300,19 @@ public final class ItemList {
         returnItem.setDescription(processedLine[1]);
         returnItem.setLocation(processedLine[2]);
         returnItem.setCategory(processedLine[3]);
-        returnItem.setItemId(processedLine[4]);
         returnItem.setDateAdded(processedLine[5]);
         returnItem.setWarrantyExpiration(processedLine[6]);
         returnItem.setAssociatedPerson(processedLine[7]);
         returnItem.setUnitPrice(processedLine[8]);
+        returnItem.setOwner(processedLine[11]);
+        returnItem.setItemId();
 
-        //basically casting as a boolean because that's how items are set up yo
+        //basically casting as a boolean because that's how items are set up
         if(Boolean.valueOf(processedLine[9])){
             returnItem.checkOut();
         }else{
             returnItem.checkIn();
+            returnItem.setDateAdded();
         }
 
         //set consumable makes the item consumable. Items are not consumable by defualt
@@ -293,7 +343,11 @@ public final class ItemList {
             line = fileReader.readLine();
             while(line != null){
                 Item itemToAdd = ItemList.processLine(line);
+                itemToAdd.setItemId();
                 items.add(itemToAdd);
+                //IDMap.put(itemToAdd.getItemId(), itemToAdd);
+
+
                 line = fileReader.readLine();
 
             }

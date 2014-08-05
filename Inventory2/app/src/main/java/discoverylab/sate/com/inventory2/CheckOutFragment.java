@@ -1,6 +1,7 @@
 package discoverylab.sate.com.inventory2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -42,6 +43,21 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
     public CheckOutFragment() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.e(TAG, "starting checkout fragment view");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.e(TAG, "resuming checkout fragment view");
+        ((ListItemAdapter)listOfItems.getAdapter()).notifyDataSetChanged();
+    }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,12 +111,15 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.e(TAG, "attaching checkout frag to activity");
+
 
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.e(TAG, "detaching checkout frag from activity");
 
     }
 
@@ -154,10 +173,32 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
 
     private void showItemDialog(Item item) {
         android.app.FragmentManager fm = getFragmentManager();
-        ItemFragment itemFrag = new ItemFragment();
-        itemFrag.setItem(item);
-        itemFrag.setViewOptions(false);
-        itemFrag.show(fm, "fragment_edit_name");
+        ConfirmCheckOut confirm = new ConfirmCheckOut();
+        confirm.setTargetFragment(this, 1);
+
+        //gives the confirm checkIn fragment the item so that it is able to change it based onClick
+        confirm.setItem(item);
+
+        //this will show at the top of the dialog
+        String dialogTitle = "Confirm Check-out for "+item.getItemName();
+        confirm.show(fm, dialogTitle);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+
+
+            itemList = ItemList.getInstance().checkInList();
+
+            ListItemAdapter arrayAdapterAll = new ListItemAdapter(getActivity(), R.layout.browse_list_item, itemList);
+            setArrayAdapter(arrayAdapterAll);
+
+            getActivity().onContentChanged();
+
+        }
+
+
     }
 
 }

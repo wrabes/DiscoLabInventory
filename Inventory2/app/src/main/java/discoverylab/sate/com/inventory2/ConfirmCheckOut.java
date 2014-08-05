@@ -48,9 +48,7 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
      */
     public static ConfirmCheckOut newInstance() {
         ConfirmCheckOut fragment = new ConfirmCheckOut();
-        Bundle args = new Bundle();
 
-        fragment.setArguments(args);
         return fragment;
     }
     public ConfirmCheckOut() {

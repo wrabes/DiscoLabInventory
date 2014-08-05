@@ -1,12 +1,12 @@
-iPad 2;32GB;2A;Tablet;10402005;06072014;06072015;Lucas Cron;399.00;true;false~
-Nao;v4;1B;Robotics;10503001;01012013;06012014;Sarah Bork;16000.00;true;false~
-Oculus Rift;none;2B;Computer Vision;10604001;04202013;04202014;Sid Beier;300.00;true;false~
-Oculus Rift;none;2B;Computer Vision;10704002;04202013;04202014;Tyler Milburn;300.00;true;false~
-Oculus Rift;none;2B;Computer Vision;10804003;04202013;04202014;Pawel Grzebala;300.00;true;false~
-Oculus Rift;none;2B;Computer Vision;10004004;04202013;04202014;none;300.00;false;false~
-Raspberry Pi;Model B;3A;Microcontroller;10001001;06012014;06012015;none;35.00;false;false~
-Raspberry Pi;Model A;3A;Microcontroller;10101002;06012014;06012015;Bob Randy;25.00;true;false~
-Nexus 7;16GB;2A;Tablet;10202001;06022014;06022015;Wes Nash;199.00;true;false~
-Nexus 7;32GB;2A;Tablet;10302002;06032014;06032015;Cam Wrabel;299.00;true;false~
-iPad 2;32GB;2A;Tablet;10002003;06062014;06062015;none;399.00;false;false~
-iPad 2;32GB;2A;Tablet;10002004;06062014;06062015;none;399.00;false;false~
+iPad 2;32GB;2A;Tablet;10402005;06072014;06072015;Lucas Cron;399.00;true;false;WBI
+Nao;v4;1B;Robotics;10503001;01012013;06012014;Sarah Bork;16000.00;true;false;WSU
+Oculus Rift;none;2B;Computer Vision;10604001;04202013;04202014;Sid Beier;300.00;true;false;WBI;
+Oculus Rift;none;2B;Computer Vision;10704002;04202013;04202014;Tyler Milburn;300.00;true;false;WBI;
+Oculus Rift;none;2B;Computer Vision;10804003;04202013;04202014;Pawel Grzebala;300.00;true;false;WBI;
+Oculus Rift;none;2B;Computer Vision;10004004;04202013;04202014;none;300.00;false;false;WBI;
+Raspberry Pi;Model B;3A;Microcontroller;10001001;06012014;06012015;none;35.00;false;false;WBI;
+Raspberry Pi;Model A;3A;Microcontroller;10101002;06012014;06012015;Bob Randy;25.00;true;false;WBI;
+Nexus 7;16GB;2A;Tablet;10202001;06022014;06022015;Wes Nash;199.00;true;false;WBI;
+Nexus 7;32GB;2A;Tablet;10302002;06032014;06032015;Cam Wrabel;299.00;true;false;WBI;
+iPad 2;32GB;2A;Tablet;10002003;06062014;06062015;none;399.00;false;false;WSU;
+iPad 2;32GB;2A;Tablet;10002004;06062014;06062015;none;399.00;false;false;WSU;

@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by Cameron on 7/1/14.
  */
 public class Item {
-    private String itemName, description, locationInRoom, category, itemId, dateAdded, warrantyExpiration, associatedPerson, unitPrice, dateChecked, owner;
+    private String itemName, description, locationInRoom, category, itemId, dateAdded, warrantyExpiration, associatedPerson="none", unitPrice, dateChecked, owner;
     private boolean available, consumable=false;
     private int quantity=1;
     final int ONE = 1;
@@ -74,8 +74,28 @@ public class Item {
         return category;
     }
 
-    public void setItemId(String iid){
-        itemId=iid;
+    public void setItemId(){
+
+        String prefix, suffix="";
+        int consumableInt = (consumable) ? 1 : 0;
+
+        prefix = (getOwner().substring(0,3))+(getCategory().substring(0,3))+(itemName.substring(0,3))+ (consumableInt);
+
+        if(!consumable) {
+            suffix = ItemList.getInstance().itemIdEntryNumber(prefix);
+        }else{
+            if(quantity < 100){
+                if(quantity > 9){
+                    suffix = "0"+quantity;
+                }else{
+                    suffix = "00"+quantity;
+                }
+            }else{
+                suffix += quantity;
+            }
+        }
+
+        itemId = prefix + suffix;
     }
 
     public String getItemId(){
@@ -83,21 +103,8 @@ public class Item {
     }
 
     public void setDateAdded(){
-        Calendar cal = Calendar.getInstance();
-        String dayOfMonth="", month="", year="";
+        dateAdded = new SimpleDateFormat("MMddyyyy_HH:mm:ss").format(Calendar.getInstance().getTime());
 
-        dayOfMonth += cal.get(Calendar.DAY_OF_MONTH);
-        month += cal.get(Calendar.MONTH);
-        year += cal.get(Calendar.YEAR);
-
-        if(dayOfMonth.length() < 2){
-            dayOfMonth = "0"+dayOfMonth;
-        }
-        if(month.length() < 2){
-            month = "0"+month;
-        }
-
-        dateAdded = month+dayOfMonth+year;
     }
 
     public void setDateAdded(String date){
@@ -159,7 +166,14 @@ public class Item {
     public void setAssociatedPerson(String personName){
         //if the person is not in the person list, create a new person object
         // otherwise, just add the string of the person's name
-        associatedPerson = personName;
+
+
+        if(personName.equals("") || personName.equals("none")){
+            checkIn();
+        }else{
+            associatedPerson = personName;
+
+        }
     }
 
     public String getAssociatedPerson(){
@@ -171,7 +185,7 @@ public class Item {
     }
 
     public String getUnitPrice(){
-        return unitPrice;
+        return "$"+unitPrice;
     }
 
     public void checkOut(){

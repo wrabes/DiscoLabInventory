@@ -37,9 +37,7 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
      */
     public static ConfirmCheckIn newInstance() {
         ConfirmCheckIn fragment = new ConfirmCheckIn();
-        Bundle args = new Bundle();
 
-        fragment.setArguments(args);
         return fragment;
     }
     public ConfirmCheckIn() {
@@ -86,6 +84,11 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
             case R.id.Checkin_Yes_Button:
                 itemToCheckIn.checkIn();
                 confirmCheckin();
+
+                //this line gets a reference to the sectons pager adapter in the main activity,
+                //and updates to reflect the changes made. Used to synchronize changes made in one fragment as a workaround
+                //to the ViewPager which caches each fragment that is on either "side" of the currently viewed tab.
+                ((MainActivity)getActivity()).getmSectionsPagerAdapter().notifyDataSetChanged();
                 this.dismiss();
 
                 break;
@@ -107,9 +110,9 @@ public class ConfirmCheckIn extends DialogFragment implements View.OnClickListen
     private void confirmCheckin() {
 
         if (getTargetFragment() != null) {
-            // for now just return patient id and note id so requester may retrieve it from the global store.
             Intent i = new Intent();
             getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
+
         }
     }
 

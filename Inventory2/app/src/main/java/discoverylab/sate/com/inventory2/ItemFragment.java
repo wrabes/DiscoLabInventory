@@ -41,7 +41,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
     private AutoCompleteTextView owner;
 
 
-
+    private static final int CAMERA_REQUEST_CODE = 42;
 
 
     //get the context so making toast is possible
@@ -60,7 +60,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
 
 
     private Button cancel, edit, save;
-     Item selectedItem;
+    Item selectedItem;
     Item newItem = new Item();
     boolean isNew;
     boolean available;
@@ -144,7 +144,7 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
                 try {
                     if (canCheckOut()) {
                         available = false;
-                        Toast.makeText(ctext, "The item will be checked out.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctext, "The item can be checked out to "+associatedPerson.getText().toString(), Toast.LENGTH_SHORT).show();
                         setCheckInButton(true);
 
 
@@ -193,7 +193,10 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
                         //this will add the item to the list of items
                         ItemList.getInstance().setItems(newItem);
 
+                        //TODO add an image to the new item
 
+
+                        //just resets the process of adding a new item
                         clearNewItemView();
 
                     } else {
@@ -335,6 +338,18 @@ public class ItemFragment extends DialogFragment implements View.OnClickListener
             available = false;
         }
 
+    }
+
+    private void addImageToItem() {
+        Intent i = new Intent(getActivity(), CameraActivity.class);
+        String id = "";
+        if(isNew){
+            id = newItem.getItemId();
+        }else{
+            id = selectedItem.getItemId();
+        }
+        i.putExtra(CameraActivity.ID_EXTRA, id);
+        startActivityForResult(i, CAMERA_REQUEST_CODE);
     }
 
     /**

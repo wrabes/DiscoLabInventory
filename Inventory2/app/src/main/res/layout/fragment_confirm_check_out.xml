@@ -21,10 +21,13 @@
         android:layout_height="35dp"
         android:hint="Associated Person..."
         android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
         android:layout_marginBottom="10dp"
         android:id="@+id/Checkout_associatedPerson"
         android:layout_below="@id/Checkout_prompt"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:capitalize="words"
+        android:maxLines="1" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

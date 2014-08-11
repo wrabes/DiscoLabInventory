@@ -99,6 +99,8 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
             public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3){
                 //do something here...like enter a different view
                 Item selectedItem = itemList.get(position);
+                showCheckOutDialog(selectedItem);
+
             }
         });
 
@@ -166,12 +168,12 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
                 //do something here...like enter a different view
                 Item selectedItem = (Item)arg0.getAdapter().getItem(position);//.get(position);
 
-                showItemDialog(selectedItem);
+                showCheckOutDialog(selectedItem);
             }
         });
     }
 
-    private void showItemDialog(Item item) {
+    private void showCheckOutDialog(Item item) {
         android.app.FragmentManager fm = getFragmentManager();
         ConfirmCheckOut confirm = new ConfirmCheckOut();
         confirm.setTargetFragment(this, 1);
@@ -189,7 +191,7 @@ public class CheckOutFragment extends Fragment implements View.OnClickListener {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
 
 
-            itemList = ItemList.getInstance().checkInList();
+            itemList = ItemList.getInstance().checkOutList();
 
             ListItemAdapter arrayAdapterAll = new ListItemAdapter(getActivity(), R.layout.browse_list_item, itemList);
             setArrayAdapter(arrayAdapterAll);

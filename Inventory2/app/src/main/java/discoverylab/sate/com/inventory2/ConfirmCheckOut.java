@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
 
     private Button noButton, yesButton;
     private AutoCompleteTextView associatedPerson;
-    private Item itemToCheckOut;
+    public static Item itemToCheckOut;
     private PersonList persons;
     private ListView ListPersons;
     private int canConfirm = 0;
@@ -73,10 +74,12 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
         ArrayList<String> personNames = persons.personListNames();
 
 
-        //TODO make a layout for this fragment
+        //instantiate the buttons with their respective layouts specified in xml
         noButton = (Button) view.findViewById(R.id.Checkout_No_Button);
         yesButton = (Button) view.findViewById(R.id.Checkout_Yes_Button);
         associatedPerson = (AutoCompleteTextView) view.findViewById(R.id.Checkout_associatedPerson);
+
+        associatedPerson.setText("");
 
         //set onClickListeners for Buttons
         noButton.setOnClickListener(this);
@@ -107,9 +110,25 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
                 this.dismiss();
                 break;
             case R.id.Checkout_Yes_Button:
-                itemToCheckOut.checkOut();
-                confirmCheckOut();
-                this.dismiss();
+
+                String personEntry = associatedPerson.getText().toString();
+
+                if(canCheckOut(personEntry)) {
+
+                    itemToCheckOut.setAssociatedPerson(personEntry);
+                    itemToCheckOut.checkOut();
+
+                    //this line gets a reference to the sectons pager adapter in the main activity,
+                    //and updates to reflect the changes made. Used to synchronize changes made in one fragment as a workaround
+                    //to the ViewPager which caches each fragment that is on either "side" of the currently viewed tab.
+                    ((MainActivity)getActivity()).getmSectionsPagerAdapter().notifyDataSetChanged();
+
+                    confirmCheckOut();
+                    this.dismiss();
+                    Toast.makeText(getActivity(),"The item has been checked out to "+personEntry, Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getActivity(),"Entry \""+personEntry+"\" is not a valid person name.", Toast.LENGTH_SHORT).show();
+                }
 
                 break;
             case R.id.Checkout_associatedPerson:
@@ -129,6 +148,17 @@ public class ConfirmCheckOut extends DialogFragment implements View.OnClickListe
      */
     public void setItem(Item item){
         itemToCheckOut = item;
+    }
+
+    private boolean canCheckOut(String personEntry){
+        boolean yesCan = true;
+
+        //TODO this should check if the name is in the list of persons (since the persons will be read from the database, we need to store them in a list.)
+        if(personEntry.equals("") || personEntry.length() < 4){
+            yesCan = false;
+        }
+
+        return yesCan;
     }
 
     private void confirmCheckOut() {

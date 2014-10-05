@@ -149,6 +149,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             switch(position){
                 case 0:
                     //TODO add a search fragment
+                    displayed = new SearchFragment();
                     break;
                 case 1:
                     displayed = new BrowseFragment();

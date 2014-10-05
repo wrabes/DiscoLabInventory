@@ -43,11 +43,7 @@ public class ListItemAdapter extends ArrayAdapter<Item>{
         String date = "";
         String person = item.getAssociatedPerson();
 
-        //get a color ready for the background of the person
 
-
-        //GradientDrawable rightSideAvailable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, greens);
-       // GradientDrawable rightSideUnavailable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, reds);
 
 
         //if the item is checked out, return a checkout date
